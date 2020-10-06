@@ -69,6 +69,8 @@ services:
   traefik_acolher:
     image: "traefik"
     restart: always
+    pilot:
+      token: ${TOKEN}
     command:
       - "--api.insecure=true"
       - "--api.dashboard=true"
