@@ -57,7 +57,7 @@ services:
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
       - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
 
-  traefik_acolher:
+  traefik:
     image: "traefik"
     restart: always
     command:
