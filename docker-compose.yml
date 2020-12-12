@@ -21,7 +21,7 @@ services:
 
   mysql:
     container_name: mysql_${HOST}
-    image: mysql:8.0.22
+    image: mysql:8.0.1
     restart: always
     ports:
       - 3307:3306
