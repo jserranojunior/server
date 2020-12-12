@@ -21,10 +21,10 @@ services:
 
   mysql:
     container_name: mysql_${HOST}
-    image: mysql:5.7.32
+    image: mysql:8.0.22
     restart: always
     ports:
-      - 3306:3306
+      - 3307:3306
     environment:
       # MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${USER}
@@ -38,7 +38,7 @@ services:
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.mysql.rule=Host(`mysql.${DOMAIN}`)
-      - traefik.http.services.mysql.loadbalancer.server.port=3308
+      - traefik.http.services.mysql.loadbalancer.server.port=3306
 
   phpmyadmin:
     container_name: "phpmyadmin"
