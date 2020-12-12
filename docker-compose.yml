@@ -38,7 +38,7 @@ services:
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.mysql.rule=Host(`mysql.${DOMAIN}`)
-      - traefik.http.services.mysql.loadbalancer.server.port=3306
+      - traefik.http.services.mysql.loadbalancer.server.port=3308
 
   phpmyadmin:
     container_name: "phpmyadmin"
