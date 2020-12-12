@@ -5,23 +5,23 @@ networks:
     driver: bridge
 
 services:
-  portainer:
-    image: portainer/portainer
-    command: -H unix:///var/run/docker.sock
-    restart: always
-    networks:
-      - internal
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      # - portainer_data:/data
-    labels:
-      - "traefik.enable=true"
-      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
+  # portainer:
+  #   image: portainer/portainer
+  #   command: -H unix:///var/run/docker.sock
+  #   restart: always
+  #   networks:
+  #     - internal
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     # - portainer_data:/data
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
+  #     - traefik.http.services.portainer.loadbalancer.server.port=9000
 
   mysql:
     container_name: mysql_${HOST}
-    image: mysql:8.0.1
+    image: mysql:5.7.32
     restart: always
     ports:
       - 3306:3306
