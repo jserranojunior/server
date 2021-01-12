@@ -25,7 +25,7 @@ services:
     restart: always
     ports:
       - 3307:3306
-    mem_limit: 100m
+    mem_limit: 200m
     environment:
       # MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${USER}
@@ -47,7 +47,7 @@ services:
     restart: always
     environment:
       PMA_HOST: mysql_${HOST}
-    mem_limit: 80m
+    mem_limit: 20m
     depends_on:
       - mysql
     ports:
