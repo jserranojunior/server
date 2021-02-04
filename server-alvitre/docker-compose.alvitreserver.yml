@@ -1,3 +1,4 @@
+
 version: "2"
 
 networks:
@@ -8,6 +9,8 @@ services:
   cloudflare-ddns:
       image: oznu/cloudflare-ddns:latest                 # use 'latest' para linux ou 'armhf' or 'aarch64' se usar um Raspberry Pi
       restart: always
+      networks:
+        - internal
       environment:
         - API_KEY=${APICLOUNDFLARE}     # coloque sua chave de api da cloudflare
         - ZONE=alvitre.net                           # coloque o seu dominio                             
@@ -19,7 +22,6 @@ services:
     restart: always
     ports:
       - 3307:3306
-    mem_limit: 300m
     environment:
       # MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${USER}
@@ -36,16 +38,15 @@ services:
       - traefik.http.services.mysql.loadbalancer.server.port=3306
 
   phpmyadmin:
-    container_name: "phpmyadmin"
+    container_name: "phpmyadminserver"
     image: phpmyadmin/phpmyadmin:latest
     restart: always
     environment:
       PMA_HOST: mysql_${HOST}
-    mem_limit: 20m
     depends_on:
       - mysql
     ports:
-      - 2050:80
+      - 2052:80
     networks:
       - internal
     labels:
@@ -62,13 +63,12 @@ services:
       - "--api.debug=true"
       - "--providers.docker"
       - "--providers.docker.exposedByDefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.address=:2095"
+      - "--entrypoints.websecure.address=:2096"
     ports:
-      - "80:80"
-      - "8080:8080"
-      - "443:443"
-    mem_limit: 30m
+      - "2095:2095"
+      - "8880:8080"
+      - "2096:2096"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
