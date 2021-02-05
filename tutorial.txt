@@ -1,0 +1,21 @@
+Aponta o dominio na Registro Br para os DNS da cloundflare
+
+No site  da cloundflare
+Coloca o DNS fazendo apontamento para o IP atual do servidor
+Padrão: 
+A dominio.com 179.110.46.203 Auto Com proxy
+
+HABILITAR A TROCA DE IP AUTOMATICAMENTE
+
+Gerar um token de API:
+Faça o login no painel Cloudflare.
+No menu suspenso Meu Perfil, clique em Meu Perfil.
+Clique na guia Tokens de API .
+Clique no botão Criar token
+No item Editar DNS de Zona clica em USAR MODELO
+Em RECURSOS DE ZONA seleciona o dominio
+Clica em continuar até o resumo, depois em Criar Token
+Copia o token gerado.
+
+VJvDeaESYfxMSpAYyUsoZe00QDOBfDnP7GCUUr38
+

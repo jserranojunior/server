@@ -13,7 +13,7 @@ services:
         - internal
       environment:
         - API_KEY=${APICLOUNDFLARE}     # coloque sua chave de api da cloudflare
-        - ZONE=alvitre.net                           # coloque o seu dominio                             
+        - ZONE=${HOST}                     # coloque o seu dominio                             
         - PROXIED=true
 
   mysql:
