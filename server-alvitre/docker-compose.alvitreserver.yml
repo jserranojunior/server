@@ -54,6 +54,35 @@ services:
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
       - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
 
+  pihole:
+    container_name: pihole
+    domainname: localhost
+    hostname: pihole
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    volumes:
+      - ./pihole/docker/pihole/pihole:/etc/pihole
+      - ./pihole/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
+    environment:
+      - TZ= 'America/Chicago'
+      - VIRTUAL_HOST=pihole.czs.localhost 
+      - WEBPASSWORD=PIHOLEWEBPASSWORD
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pihole-http.rule=Host(`pihole.czs.localhost`)"
+      - "traefik.http.routers.pihole-http.entrypoints=web"
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
+      - "traefik.tcp.routers.pihole-dns.entrypoints=dns"
+      - "traefik.tcp.routers.pihole-dns.service=pihole"
+      - "traefik.udp.routers.pihole-udp.entrypoints=udpdns"
+      - "traefik.udp.routers.pihole-udp.service=pihole"
+      - "traefik.udp.services.pihole.loadbalancer.server.port=53"   
+
   traefik:
     image: "traefik"
     restart: always
@@ -65,10 +94,13 @@ services:
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.web.address=:2095"
       - "--entrypoints.websecure.address=:2096"
+      - "--entrypoints.udpdns.address=:53/udp"
     ports:
       - "2095:2095"
       - "8880:8080"
       - "2096:2096"
+      - "53:53/udp"
+      - "53:53"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
