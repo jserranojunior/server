@@ -67,6 +67,8 @@ services:
       - TZ= 'America/Chicago'
       - VIRTUAL_HOST=pihole.czs.localhost 
       - WEBPASSWORD=PIHOLEWEBPASSWORD
+    ports:
+      - 5380:80
     dns:
       - 127.0.0.1
       - 1.1.1.1
