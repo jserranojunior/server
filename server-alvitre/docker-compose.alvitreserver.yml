@@ -98,9 +98,9 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.udpdns.address=:53/udp"
     ports:
-      - "2095:80"
-      - "8880:8080"
-      - "2096:443"
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
       - "53:53/udp"
       - "53:53"
     volumes:
