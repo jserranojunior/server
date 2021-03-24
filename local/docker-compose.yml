@@ -21,13 +21,14 @@ services:
 
   mysql:
     container_name: mysql_${HOST}
-    image: mysql:5.7
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
     ports:
-      - 3307:3306
+      - 3306:3306
     mem_limit: 200m
     environment:
-      # MYSQL_DATABASE: ${DB}
+      MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${USER}
       MYSQL_ROOT_PASSWORD: ${PASS}
       MYSQL_PASSWORD: ${PASS}
@@ -66,20 +67,16 @@ services:
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.services.traefik.loadbalancer.server.port=8080
 
-        # phpmyadmin:
-  #   container_name: "phpmyadmin"
-  #   image: phpmyadmin/phpmyadmin:latest
-  #   restart: always
-  #   environment:
-  #     PMA_HOST: mysql_${HOST}
-  #   mem_limit: 20m
-  #   depends_on:
-  #     - mysql
-  #   ports:
-  #     - 2050:80
-  #   networks:
-  #     - internal
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
-  #     - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 2050:80
+    networks:
+      - internal
+    environment:
+      PMA_HOST: mysql_${HOST}
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
+      - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
+
