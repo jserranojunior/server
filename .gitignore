@@ -1,8 +1,5 @@
-/database
-/mail
+database
 .env
-/pihole
-/monolito
-../pihole
-server-alvitre/pihole/
-/server-alvitre/pihole/
+pihole
+portainer
+volumes

@@ -6,20 +6,25 @@ networks:
     driver: bridge
 
 services:
-  cloudflare-ddns:
-      image: oznu/cloudflare-ddns:latest                 # use 'latest' para linux ou 'armhf' or 'aarch64' se usar um Raspberry Pi
-      restart: always
-      networks:
-        - internal
-      environment:
-        - API_KEY=${APICLOUNDFLARE}     # coloque sua chave de api da cloudflare
-        - ZONE=${DOMAIN}                     # coloque o seu dominio                             
-        - PROXIED=true
+   portainer:
+    image: portainer/portainer
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    networks:
+      - internal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../volumes/portainer/data:/data
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
 
   mysql:
     container_name: mysql_${HOST}
     image: mysql:5.7
     restart: always
+    mem_limit: 200m
     ports:
       - 3307:3306
     environment:
@@ -29,7 +34,7 @@ services:
       MYSQL_PASSWORD: ${PASS}
       SERVICE_NAME: mysql.${HOST}
     volumes:
-      - ../database/mysql:/var/lib/mysql
+      - ../volumes/database/mysql:/var/lib/mysql
     networks:
       - internal
     labels:
@@ -37,32 +42,16 @@ services:
       - traefik.http.routers.mysql.rule=Host(`mysql.${DOMAIN}`)
       - traefik.http.services.mysql.loadbalancer.server.port=3306
 
-  phpmyadmin:
-    container_name: "phpmyadminserver"
-    image: phpmyadmin/phpmyadmin:latest
-    restart: always
-    environment:
-      PMA_HOST: mysql_${HOST}
-    depends_on:
-      - mysql
-    ports:
-      - 2052:80
-    networks:
-      - internal
-    labels:
-      - "traefik.enable=true"
-      - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
-      - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
 
   pihole:
     container_name: pihole
     domainname: localhost
     hostname: pihole
     image: pihole/pihole:latest
-    restart: unless-stopped
+    restart: always
     volumes:
-      - ./pihole/docker/pihole/pihole:/etc/pihole
-      - ./pihole/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
+      - ../volumes/pihole/docker/pihole/pihole:/etc/pihole
+      - ./volumes/pihole/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
     environment:
       - TZ= 'America/Chicago'
       - VIRTUAL_HOST=pihole.czs.localhost 
@@ -111,4 +100,3 @@ services:
       - "traefik.enable=true"
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.services.traefik.loadbalancer.server.port=8080
-
