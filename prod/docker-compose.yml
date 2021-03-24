@@ -41,18 +41,15 @@ services:
 
   mysql:
     container_name: mysql_${HOST}
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
+    image: mysql:8.0
     restart: always
     ports:
       - 3306:3306
-    mem_limit: 200m
     environment:
-      MYSQL_DATABASE: ${DB}
-      MYSQL_USER: ${USER}
-      MYSQL_ROOT_PASSWORD: ${PASS}
-      MYSQL_PASSWORD: ${PASS}
-      SERVICE_NAME: mysql.${HOST}
+      - MYSQL_USER=${USER}
+      - MYSQL_ROOT_PASSWORD=${PASS}
+      - MYSQL_PASSWORD=${PASS}
+      - SERVICE_NAME=mysql.${HOST}
     volumes:
       - ../volumes/database/mysql:/var/lib/mysql
     networks:
@@ -71,7 +68,7 @@ services:
     restart: always
     volumes:
       - ../volumes/pihole/docker/pihole/pihole:/etc/pihole
-      - ./volumes/pihole/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
+      - ../volumes/pihole/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
     environment:
       - TZ= 'America/Chicago'
       - VIRTUAL_HOST=pihole.czs.localhost 
