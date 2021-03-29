@@ -104,13 +104,13 @@ services:
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.udpdns.address=:53/udp"
+      # - "--entrypoints.udpdns.address=:53/udp"
     ports:
       - "80:80"
       - "8080:8080"
       - "443:443"
-      - "53:53/udp"
-      - "53:53"
+      # - "53:53/udp"
+      # - "53:53"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
