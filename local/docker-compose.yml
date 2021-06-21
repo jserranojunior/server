@@ -69,6 +69,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin
+    restart: always
     ports:
       - 2050:80
     networks:
@@ -79,4 +80,3 @@ services:
       - "traefik.enable=true"
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
       - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
-
