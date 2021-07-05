@@ -5,41 +5,6 @@ networks:
     driver: bridge
 
 services:
-  portainer:
-    image: portainer/portainer
-    command: -H unix:///var/run/docker.sock
-    restart: always
-    networks:
-      - internal
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ../volumes/portainer/data:/data
-    labels:
-      - "traefik.enable=true"
-      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
-
-  nextclound:
-    image: nextcloud
-    restart: always
-    ports:
-      - 5782:80
-    networks:
-      - internal
-    volumes:
-      - ../volumes/nextcloud:/var/www/html
-    links:
-      - mysql
-    environment:
-      - MYSQL_PASSWORD=
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=root
-      - MYSQL_HOST=mysql_${HOST}
-    labels:
-      - "traefik.enable=true"
-      - traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN}`)
-      - traefik.http.services.nextcloud.loadbalancer.server.port=80
-
   mysql:
     container_name: mysql_${HOST}
     image: mysql:8.0
@@ -59,37 +24,6 @@ services:
       - "traefik.enable=true"
       - traefik.http.routers.mysql.rule=Host(`mysql.${DOMAIN}`)
       - traefik.http.services.mysql.loadbalancer.server.port=3306
-
-  # pihole:
-  #   container_name: pihole
-  #   domainname: localhost
-  #   hostname: pihole
-  #   image: pihole/pihole:latest
-  #   restart: always
-  #   volumes:
-  #     - ../volumes/pihole/docker/pihole/pihole:/etc/pihole
-  #     - ../volumes/pihole/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
-  #   environment:
-  #     - TZ= 'America/Chicago'
-  #     - VIRTUAL_HOST=pihole.czs.localhost
-  #     - WEBPASSWORD=${PASSPIHOLE}
-  #   ports:
-  #     - 5380:80
-  #   dns:
-  #     - 127.0.0.1
-  #     - 1.1.1.1
-  #   networks:
-  #     - internal
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.pihole-http.rule=Host(`pihole.czs.localhost`)"
-  #     - "traefik.http.routers.pihole-http.entrypoints=web"
-  #     - "traefik.http.services.pihole.loadbalancer.server.port=80"
-  #     - "traefik.tcp.routers.pihole-dns.entrypoints=dns"
-  #     - "traefik.tcp.routers.pihole-dns.service=pihole"
-  #     - "traefik.udp.routers.pihole-udp.entrypoints=udpdns"
-  #     - "traefik.udp.routers.pihole-udp.service=pihole"
-  #     - "traefik.udp.services.pihole.loadbalancer.server.port=53"
 
   traefik:
     image: "traefik"
