@@ -7,6 +7,7 @@ networks:
 services:
   mysql:
     container_name: mysql_${HOST}
+    user: 1000:1000
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
