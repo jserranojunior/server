@@ -1,5 +1,4 @@
 database
 .env
-pihole
-portainer
 volumes
+mysql.sh

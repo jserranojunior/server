@@ -1,0 +1,23 @@
+version: "3.1"
+
+networks:
+  stack_ponte:
+    external: true
+
+services:
+  portainer:
+    container_name: portainer_${HOST}
+    image: portainer/portainer-ce
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    networks:
+      - stack_ponte
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${VOLUMES}/portainer/data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
+      - traefik.http.services.portainer.loadbalancer.server.port=9000

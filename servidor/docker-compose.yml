@@ -1,24 +1,10 @@
-version: "2"
+version: "3.1"
 
 networks:
-  internal:
-    driver: bridge
+  stack_ponte:
+    external: true
 
 services:
-  portainer:
-    image: portainer/portainer
-    command: -H unix:///var/run/docker.sock
-    restart: always
-    networks:
-      - internal
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ../volumes/portainer/data:/data
-    labels:
-      - "traefik.enable=true"
-      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
-
   mysql:
     container_name: mysql_${HOST}
     image: mysql
@@ -26,7 +12,6 @@ services:
     restart: always
     ports:
       - 3306:3306
-    mem_limit: 200m
     environment:
       MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${USER}
@@ -34,9 +19,9 @@ services:
       MYSQL_PASSWORD: ${PASS}
       SERVICE_NAME: mysql.${HOST}
     volumes:
-      - ../volumes/database/mysql:/var/lib/mysql
+      - ${VOLUMES}/database/mysql:/var/lib/mysql
     networks:
-      - internal
+      - stack_ponte
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.mysql.rule=Host(`mysql.${DOMAIN}`)
@@ -57,11 +42,10 @@ services:
       - "80:80"
       - "8080:8080"
       - "443:443"
-    mem_limit: 30m
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - internal
+      - stack_ponte
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
@@ -73,7 +57,7 @@ services:
     ports:
       - 2050:80
     networks:
-      - internal
+      - stack_ponte
     environment:
       PMA_HOST: mysql_${HOST}
     labels:
