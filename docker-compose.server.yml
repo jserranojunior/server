@@ -1,0 +1,88 @@
+version: "3.1"
+
+networks:
+  stack_ponte:
+    external: true
+
+services:
+  mariadb:
+    image: ghcr.io/linuxserver/mariadb
+    container_name: ${DATABASE}
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=${DBPASS}
+      - TZ=${TZ}
+      - MYSQL_DATABASE=${DB}
+      - MYSQL_USER=${USER}
+      - MYSQL_PASSWORD=${DBPASS}
+    volumes:
+      - ${VOLUMES}/maridb/config:/config
+    networks:
+      - stack_ponte
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+
+  # mysql:
+  #   container_name: mysql_${HOST}
+  #   user: 1000:1000
+  #   image: mysql
+  #   command: --default-authentication-plugin=mysql_native_password
+  #   restart: always
+  #   ports:
+  #     - 3306:3306
+  #   environment:
+  #     MYSQL_DATABASE: ${DB}
+  #     MYSQL_USER: ${USER}
+  #     MYSQL_ROOT_PASSWORD: ${PASS}
+  #     MYSQL_PASSWORD: ${PASS}
+  #     SERVICE_NAME: mysql.${HOST}
+  #   volumes:
+  #     - ${VOLUMES}/database/mysql:/var/lib/mysql
+  #   networks:
+  #     - stack_ponte
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - traefik.http.routers.mysql.rule=Host(`mysql.${DOMAIN}`)
+  #     - traefik.http.services.mysql.loadbalancer.server.port=3306
+
+  traefik:
+    image: "traefik"
+    restart: always
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--api.debug=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - stack_ponte
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 2050:80
+    networks:
+      - stack_ponte
+    environment:
+      PMA_HOST: ${DATABASE}
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
+      - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
