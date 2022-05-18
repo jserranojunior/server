@@ -48,6 +48,7 @@ services:
       - "traefik.enable=true"
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - "traefik.http.routers.traefik.tls.certresolver=le"
 
   phpmyadmin:
     image: lscr.io/linuxserver/phpmyadmin:latest
@@ -67,3 +68,4 @@ services:
       - "traefik.enable=true"
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
       - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
+      - "traefik.http.routers.phpmyadmin.tls.certresolver=le"
