@@ -1,10 +1,36 @@
-version: "3.1"
+version: "3.3"
 
 networks:
   stack_ponte:
     external: true
 
 services:
+  traefik:
+    image: traefik:v2.8.0
+    restart: always
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--api.debug=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - stack_ponte
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+
 #  duplicati:
 #    image: lscr.io/linuxserver/duplicati:latest
 #    container_name: duplicati
@@ -46,30 +72,7 @@ services:
       - 3306:3306
     restart: unless-stopped
 
-  traefik:
-    image: traefik:v2.8.1
-    restart: always
-    container_name: traefik
-    command:
-      - "--api.insecure=true"
-      - "--api.dashboard=true"
-      - "--api.debug=true"
-      - "--providers.docker"
-      - "--providers.docker.exposedByDefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-    ports:
-      - "80:80"
-      - "8080:8080"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - stack_ponte
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
-      - traefik.http.services.traefik.loadbalancer.server.port=8080
+
 
   phpmyadmin:
     image: linuxserver/phpmyadmin:5.2.0
@@ -84,7 +87,7 @@ services:
       - PGID=1000
       - TZ=${TZ}
       - PMA_ARBITRARY=1
-      - PMA_HOST=${DATABASE}
+
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
