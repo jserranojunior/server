@@ -5,15 +5,37 @@ networks:
     external: true
 
 services:
+#  duplicati:
+#    image: lscr.io/linuxserver/duplicati:latest
+#    container_name: duplicati
+#    environment:
+#      - PUID=1000
+#      - PGID=1000
+#      - TZ=${TZ}
+#      - CLI_ARGS= #optional
+#    volumes:
+#      - ${VOLUMES}/duplicati:/config
+#      - /mnt/wolf/files/Developer/backups:/back
+#      - /mnt/wolf/files/Developer:/data
+#    ports:
+#      - 8200:8200
+#    restart: unless-stopped
+#    networks:
+#      - stack_ponte
+#    labels:
+#      - "traefik.enable=true"
+#      - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
+#      - traefik.http.services.duplicati.loadbalancer.server.port=8200
+    
   mariadb:
-    image: ghcr.io/linuxserver/mariadb
+    image: linuxserver/mariadb:10.5.16
     container_name: ${DATABASE}
     environment:
       - PUID=1000
       - PGID=1000
       - MYSQL_ROOT_PASSWORD=${DBPASS}
       - TZ=${TZ}
-      - MYSQL_DATABASE=${DB}
+      - MYSQL_DATABASE=${DATABASE}
       - MYSQL_USER=${USER}
       - MYSQL_PASSWORD=${DBPASS}
     volumes:
@@ -25,7 +47,7 @@ services:
     restart: unless-stopped
 
   traefik:
-    image: "traefik"
+    image: traefik:v2.8.1
     restart: always
     container_name: traefik
     command:
@@ -45,13 +67,12 @@ services:
     networks:
       - stack_ponte
     labels:
-      - "traefik.enable=true"
+      - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.services.traefik.loadbalancer.server.port=8080
-      - "traefik.http.routers.traefik.tls.certresolver=le"
 
   phpmyadmin:
-    image: lscr.io/linuxserver/phpmyadmin:latest
+    image: linuxserver/phpmyadmin:5.2.0
     container_name: phpmyadmin
     restart: always
     ports:
@@ -63,9 +84,10 @@ services:
       - PGID=1000
       - TZ=${TZ}
       - PMA_ARBITRARY=1
-
+      - PMA_HOST=${DATABASE}
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
       - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
-      - "traefik.http.routers.phpmyadmin.tls.certresolver=le"
+
+
