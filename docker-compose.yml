@@ -7,15 +7,18 @@ networks:
 services:
   portainer:
     container_name: portainer_${HOST}
-    image: portainer/portainer-ce:2.14.2
-    command: -H unix:///var/run/docker.sock
+    image: portainer/portainer-ce:2.15.1
     restart: always
+    # security_opt:
+    #   - no-new-privileges:true
     networks:
       - stack_ponte
     ports:
+      # - 5555:8000
       - 9000:9000
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      # - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${VOLUMES}/portainer/data:/data
     labels:
       - traefik.enable=true
