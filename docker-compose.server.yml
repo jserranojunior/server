@@ -5,6 +5,21 @@ networks:
     external: true
 
 services:
+  db:
+    image: mariadb
+    restart: always
+    container_name: ${DATABASE}
+    user: 1000:100
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DBPASS}
+      MARIADB_DATABASE: ${DATABASE}
+    volumes:
+      - ${VOLUMES}/maria:/var/lib/mysql
+    networks:
+      - stack_ponte
+    ports:
+      - 3306:8080
+
   traefik:
     image: traefik:v2.8.0
     restart: always
@@ -30,48 +45,27 @@ services:
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.services.traefik.loadbalancer.server.port=8080
 
-
-#  duplicati:
-#    image: lscr.io/linuxserver/duplicati:latest
-#    container_name: duplicati
-#    environment:
-#      - PUID=1000
-#      - PGID=1000
-#      - TZ=${TZ}
-#      - CLI_ARGS= #optional
-#    volumes:
-#      - ${VOLUMES}/duplicati:/config
-#      - /mnt/wolf/files/Developer/backups:/back
-#      - /mnt/wolf/files/Developer:/data
-#    ports:
-#      - 8200:8200
-#    restart: unless-stopped
-#    networks:
-#      - stack_ponte
-#    labels:
-#      - "traefik.enable=true"
-#      - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
-#      - traefik.http.services.duplicati.loadbalancer.server.port=8200
-    
-  mariadb:
-    image: linuxserver/mariadb:10.5.16
-    container_name: ${DATABASE}
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - MYSQL_ROOT_PASSWORD=${DBPASS}
-      - TZ=${TZ}
-      - MYSQL_DATABASE=${DATABASE}
-      - MYSQL_USER=${USER}
-      - MYSQL_PASSWORD=${DBPASS}
-    volumes:
-      - ${VOLUMES}/mariadb/config:/config
-    networks:
-      - stack_ponte
-    ports:
-      - 3306:3306
-    restart: unless-stopped
-
+  #  duplicati:
+  #    image: lscr.io/linuxserver/duplicati:latest
+  #    container_name: duplicati
+  #    environment:
+  #      - PUID=1000
+  #      - PGID=1000
+  #      - TZ=${TZ}
+  #      - CLI_ARGS= #optional
+  #    volumes:
+  #      - ${VOLUMES}/duplicati:/config
+  #      - /mnt/wolf/files/Developer/backups:/back
+  #      - /mnt/wolf/files/Developer:/data
+  #    ports:
+  #      - 8200:8200
+  #    restart: unless-stopped
+  #    networks:
+  #      - stack_ponte
+  #    labels:
+  #      - "traefik.enable=true"
+  #      - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
+  #      - traefik.http.services.duplicati.loadbalancer.server.port=8200
 
 
   phpmyadmin:
@@ -92,5 +86,3 @@ services:
       - "traefik.enable=true"
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
       - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
-
-
