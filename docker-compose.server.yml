@@ -18,8 +18,9 @@ services:
     networks:
       - stack_ponte
     ports:
-      - 3306:8080
-
+      - 3306:3306
+    
+    
   traefik:
     image: traefik:v2.8.0
     restart: always
@@ -31,11 +32,11 @@ services:
       - "--providers.docker"
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
+#      - "--entrypoints.websecure.address=:443"
     ports:
       - "80:80"
       - "8080:8080"
-      - "443:443"
+#      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
@@ -74,6 +75,8 @@ services:
     restart: always
     ports:
       - 2050:80
+    volumes:
+      - ${PATH}/server/phpmyadmintheme:/app/phpmyadmin/themes
     networks:
       - stack_ponte
     environment:
@@ -81,8 +84,8 @@ services:
       - PGID=1000
       - TZ=${TZ}
       - PMA_ARBITRARY=1
-
     labels:
       - "traefik.enable=true"
       - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN}`)
       - traefik.http.services.phpmyadmin.loadbalancer.server.port=80
+
