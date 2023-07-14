@@ -1,0 +1,49 @@
+version: "3.3"
+
+networks:
+  stack_ponte:
+    external: true
+
+services:
+  db:
+    image: mariadb:11.0.2
+    restart: always
+    container_name: ${DATABASE}
+    user: 1000:100
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DBPASS}
+      MARIADB_DATABASE: ${DATABASE}
+    volumes:
+      - ${VOLUMES}/mariadb:/var/lib/mysql
+    networks:
+      - stack_ponte
+    ports:
+      - 3307:3306
+    
+  phpmyadmin:
+    image: linuxserver/phpmyadmin:5.2.0
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 2050:80
+    volumes:
+      - ${PATH}/server/phpmyadmintheme:/app/phpmyadmin/themes
+    networks:
+      - stack_ponte
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=102400K
+
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    networks:
+      - stack_ponte
+    command: tunnel run 
+    environment: 
+      - TUNNEL_TOKEN=${TUNEL}

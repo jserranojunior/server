@@ -2,3 +2,8 @@ database
 .env
 volumes
 mysql.sh
+production/.end-production
+dev/.env-dev
+.env-dev
+.end-production
+portainer/.env

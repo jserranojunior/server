@@ -1,0 +1,40 @@
+version: "3.3"
+
+networks:
+  stack_dev:
+    external: true
+
+services:
+  db:
+    image: mariadb:11.0.2
+    restart: always
+    container_name: ${DATABASE}
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DBPASS}
+      MARIADB_DATABASE: ${DATABASE}
+    volumes:
+      - ${VOLUMESDEV}/mariana:/var/lib/mysql
+    networks:
+      - stack_dev
+    ports:
+      - 3306:3306
+    deploy:
+        resources:
+            limits:
+              memory: 400M
+    
+  phpmyadmin:
+    image: linuxserver/phpmyadmin:5.2.0
+    container_name: dev_phpmyadmin
+    restart: always
+    ports:
+      - 2051:80
+    volumes:
+      - ${PATH}/server/phpmyadmintheme:/app/phpmyadmin/themes
+    networks:
+      - stack_dev
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=${TZ}
+      - PMA_ARBITRARY=1
